@@ -1,0 +1,74 @@
+---
+title: "wiki-data"
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+```{r}
+library(xml2)
+wiki_dat<-read_xml("enwiki-latest-abstract.xml")
+```
+
+Parse the content
+
+```{r}
+library(XML)
+XML::xmlParse(wiki_dat)->wiki_xml
+```
+
+Examine the
+
+```{r}
+# Extract the root node.
+rootnode <- xmlRoot(res)
+
+# number of nodes in the root.
+nodes <- xmlSize(rootnode)
+
+# get entire contents of a record
+second_node <- rootnode[2]
+
+# get 3rd attribute of 4th record
+attri <- rootnode[[3]][[4]]
+
+cat('number of nodes: ', nodes)
+print ('details of 2 record: ')
+print (second_node)
+
+# prints the marks of the fourth record
+print ('3rd attribute of 4th record: ', attr)
+
+
+```
+
+```{r}
+library(rvest)
+library(tidyverse)
+url<-"https://en.wikipedia.org/wiki/List_of_football_clubs_in_England#M"
+page1<-read_html(url)
+library(Rcrawler)
+LinkExtractor(url = url)->links
+links$InternalLinks %>% unlist()-> links_txt
+fc_links<-links_txt[grepl("F.C.$",links_txt)]
+```
+
+Go through the English football team urls and find a list of managers
+
+```{r}
+fc_links %>% map(~LinkExtractor(url=.x)) -> fc_page_links
+```
+
+With the FC page lists find those with *.mangers a*t the end of the url
+
+```{r}
+function(x){
+  links<-x$InternalLinks %>% unlist()
+  if (grepl("managers$",links)) {
+    
+  }
+}
+test_urls<-fc_page_links[[3]]$InternalLinks %>% unlist()
+test_urls[grepl("managers",test_urls)] %>% read_html() %>% html_table()
+```
